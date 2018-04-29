@@ -103,9 +103,24 @@ node_templates:
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: kubernetes_master
+    interfaces: &host_agent_ops
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_create
+          executor: host_agent
+        update:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_update
+          executor: host_agent
+        delete:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_delete
+          executor: host_agent
+        start:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_read
+          executor: host_agent
 
   dashboard_service_account:
     type: cloudify.kubernetes.resources.ServiceAccount
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: v1
@@ -125,6 +140,7 @@ node_templates:
 
   dashboard_role:
     type: cloudify.kubernetes.resources.Role
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: rbac.authorization.k8s.io/v1
@@ -170,6 +186,7 @@ node_templates:
 
   dashboard_role_binding:
     type: cloudify.kubernetes.resources.RoleBinding
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: rbac.authorization.k8s.io/v1
@@ -195,6 +212,7 @@ node_templates:
 
   dashboard_deploy:
     type: cloudify.kubernetes.resources.Deployment
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: extensions/v1beta1
@@ -261,6 +279,7 @@ node_templates:
 
   dashboard_service:
     type: cloudify.kubernetes.resources.Service
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: v1
@@ -287,6 +306,7 @@ node_templates:
 
   dashboard_admin_service_account:
     type: cloudify.kubernetes.resources.ServiceAccount
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: v1
@@ -304,6 +324,7 @@ node_templates:
 
   dashboard_service_account_cluster_role:
     type: cloudify.kubernetes.resources.ClusterRoleBinding
+    interfaces: *host_agent_ops
     properties:
       definition:
         apiVersion: rbac.authorization.k8s.io/v1beta1
